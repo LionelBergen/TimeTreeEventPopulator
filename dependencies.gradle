@@ -1,0 +1,16 @@
+dependencies {
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api 'org.apache.commons:commons-math3:3.6.1'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'com.google.guava:guava:28.2-jre'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+    
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.4.0'
+	
+	// This is so we dont have to worry about having the driver.exe files somewhere!
+	implementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: '5.2.3'	  
+}
