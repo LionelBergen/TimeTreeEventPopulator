@@ -1,5 +1,7 @@
 package timetree.webapp;
 
+import java.text.ParseException;
+import java.time.LocalDate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,13 +17,23 @@ public class TimeTreeWebAppHandler {
       "input[data-test-id='signin-form-password']";
   private static final String SIGN_IN_SUBMIT_CSS_SELECTOR =
       "button[data-test-id='signin-form-submit']";
+  // 'pervious' is Timetree's typo.
+  private static final String PREVIOUS_MONTH_CSS_SELECTOR =
+      "button[data-test-id='pervious-button']";
+  private static final String NEXT_MONTH_CSS_SELECTOR = "button[data-test-id='next-button']";
 
   private static final String CALENDAR_XPATH =
       "//p[contains(@class, 'e1rg0zpy2') and text() = 'Personal']";
   private static final String CALENDAR_XPATH_2 =
       "//div[contains(@class, 'e1rg0zpy1') and contains(@class, 'css-ok59kt')]";
 
-  public static void SignIn(WebDriver driver, String username, String password) {
+  private RemoteWebDriver driver;
+
+  public TimeTreeWebAppHandler(RemoteWebDriver webDriver) {
+    this.driver = webDriver;
+  }
+
+  public void signIn(String username, String password) {
     driver.get(TIMETREE_SIGNIN_URL);
 
     sendKeysByCssSelector(driver, SIGN_IN_USERNAME_ELEMENT_CSS_SELECTOR, username);
@@ -30,13 +42,51 @@ public class TimeTreeWebAppHandler {
     driver.findElement(By.cssSelector(SIGN_IN_SUBMIT_CSS_SELECTOR)).submit();
   }
 
-  public static void SelectCalendar(RemoteWebDriver driver) throws InterruptedException {
-    Wait.WaitForElementVisible(driver, CALENDAR_XPATH);
-    WebElement element = driver.findElement(By.xpath(CALENDAR_XPATH));
+  public void selectCalendar() throws InterruptedException {
+    WebElement element = Wait.WaitForElementVisible(driver, CALENDAR_XPATH);
     driver.executeScript("arguments[0].click();", element);
 
     element = driver.findElement(By.xpath(CALENDAR_XPATH_2));
     driver.executeScript("arguments[0].click();", element);
+  }
+
+  public LocalDate getDateDisplayed() throws ParseException {
+    String result = driver.findElement(By.xpath("//time")).getAttribute("datetime");
+
+    LocalDate date = TimeTreeDateFormat.ParseDateElementValue(result);
+
+    return date;
+  }
+
+  public void addNewHoliday(LocalDate holiday) throws ParseException, InterruptedException {
+    LocalDate current = getDateDisplayed();
+
+    // Current will always be beginning of the month
+    if (holiday.isBefore(current)) {
+      goBackAMonth(current);
+    }
+  }
+
+  private LocalDate goBackAMonth(LocalDate currentDate)
+      throws InterruptedException, ParseException {
+    LocalDate newExpectedCurrent = currentDate.minusMonths(1);
+    // We expect an element with the previous month, 2nd date to be visible (all dates for the month
+    // should be visible, plus a few from the previous)
+    String expectedCssSelectorToBeVisible =
+        getElementCssSelectorForDate(newExpectedCurrent.plusDays(1));
+
+    // click previous month button
+    Wait.WaitForElementVisible(driver, By.cssSelector(PREVIOUS_MONTH_CSS_SELECTOR)).click();
+
+    // Wait for the month selection to load
+    Wait.WaitForElementVisible(driver, By.cssSelector(expectedCssSelectorToBeVisible));
+
+    // return new date (Don't calculate, to ensure working as expected)
+    return getDateDisplayed();
+  }
+
+  private String getElementCssSelectorForDate(LocalDate date) {
+    return "div[data-test-id='day-cell-" + TimeTreeDateFormat.GetFormatForDateCell(date);
   }
 
   private static void sendKeysByCssSelector(WebDriver driver, String cssSelector, String keys) {
