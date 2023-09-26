@@ -6,16 +6,9 @@ import java.util.List;
 
 public class TimeTreeEventManager {
   private static final TimeTreeEvent ROSH_HASHANAH_1 =
-      GetEvent(LocalDate.of(2023, 8, 11), "Testing11");
-  private static final TimeTreeEvent ROSH_HASHANAH_2 =
-      GetEvent(LocalDate.of(2023, 8, 10), "Testing10");
-  private static final TimeTreeEvent ROSH_HASHANAH_3 =
-      GetEvent(LocalDate.of(2023, 8, 3), "Testing3");
-  private static final TimeTreeEvent ROSH_HASHANAH_4 =
-      GetEvent(LocalDate.of(2023, 8, 1), "Testing1");
+      GetEvent(LocalDate.of(2023, 9, 27), LocalDate.of(2023, 9, 30), "Multi");
 
-  private static List<TimeTreeEvent> events =
-      Arrays.asList(ROSH_HASHANAH_1, ROSH_HASHANAH_2, ROSH_HASHANAH_3, ROSH_HASHANAH_4);
+  private static List<TimeTreeEvent> events = Arrays.asList(ROSH_HASHANAH_1);
 
   public static List<TimeTreeEvent> GetAllEvents() {
     return events;
@@ -23,5 +16,9 @@ public class TimeTreeEventManager {
 
   public static TimeTreeEvent GetEvent(LocalDate eventDate, String titleOfEvent) {
     return new TimeTreeEvent(eventDate, titleOfEvent);
+  }
+
+  public static TimeTreeEvent GetEvent(LocalDate start, LocalDate end, String titleOfEvent) {
+    return new TimeTreeEvent(start, end, titleOfEvent);
   }
 }

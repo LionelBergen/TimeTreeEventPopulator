@@ -28,8 +28,6 @@ public class Main {
 
     timeTreeWebAppHandler.signIn(username, password);
 
-    timeTreeWebAppHandler.selectCalendar();
-
     logger.info("Current calender month: " + timeTreeWebAppHandler.getDateDisplayed());
 
     for (TimeTreeEvent event : TimeTreeEventManager.GetAllEvents()) {

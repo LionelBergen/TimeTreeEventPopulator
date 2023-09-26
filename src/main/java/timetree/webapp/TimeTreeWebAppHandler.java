@@ -33,6 +33,25 @@ public class TimeTreeWebAppHandler {
   private static final String CALENDAR_XPATH_2 =
       "//div[contains(@class, 'e1rg0zpy1') and contains(@class, 'css-ok59kt')]";
 
+  private static final String COMPEX_EVENT_OPEN_CSS_SELECTOR =
+      "div[data-test-id='quick-create-more'";
+  private static final String COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR =
+      "button[data-test-id='event-form-submit-button']";
+  private static final String COMPEX_EVENT_END_DATE_CSS_SELECTOR =
+      "input[data-test-id='end-date-picker']";
+  private static final String COMPEX_EVENT_TITLE_CSS_SELECTOR = "form[data-test-id='event-form']";
+  private static final String COMPEX_EVENT_LABEL_CSS_SELECTOR =
+      "input[data-test-id='label-select']";
+  private static final String COMPEX_EVENT_LABEL_SELECTION_CSS_SELECTOR =
+      "li[data-test-id='Jewish Event']";
+  private static final String COMPEX_EVENT_MEMBERS_CSS_SELECTOR =
+      "div[data-test-id='attendees-select']";
+
+  private static final String COMPEX_EVENT_MEMBERS_LIONEL_CSS_SELECTOR =
+      "div[data-test-id='attendees-select']";
+
+  // attendees-select-item-Chava
+
   private RemoteWebDriver driver;
 
   public TimeTreeWebAppHandler(RemoteWebDriver webDriver) {
@@ -90,7 +109,11 @@ public class TimeTreeWebAppHandler {
     boolean eventInCalendar = Wait.IsElementVisible(driver, By.xpath(xPathForEventDate));
 
     if (!eventInCalendar) {
-      addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
+      if (event.getEnd() == null) {
+        addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
+      } else {
+        addEventComplex(element, event.getTitleOfEvent(), xPathForEventDate);
+      }
     } else {
       logger.info(
           "Event already set: "
@@ -127,6 +150,40 @@ public class TimeTreeWebAppHandler {
     driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
 
     Wait.WaitForElementVisible(driver, By.xpath(xPathForEventDate));
+
+    logger.info("added event successfully: " + titleOfEvent);
+  }
+
+  private void addEventComplex(WebElement element, String titleOfEvent, String xPathForEventDate)
+      throws InterruptedException {
+    logger.info("About to click and add complex event: " + titleOfEvent);
+    element.click();
+    Wait.WaitFor(50);
+    element.click();
+    Wait.WaitFor(500);
+
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_OPEN_CSS_SELECTOR)).click();
+
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR));
+
+    WebElement endDateElement =
+        driver.findElement(By.cssSelector(COMPEX_EVENT_END_DATE_CSS_SELECTOR));
+
+    endDateElement.clear();
+
+    endDateElement.sendKeys("Sep 29, 2023");
+
+    WebElement titleElement =
+        driver
+            .findElement(By.cssSelector(COMPEX_EVENT_TITLE_CSS_SELECTOR))
+            .findElement(By.tagName("textarea"));
+
+    titleElement.sendKeys(titleOfEvent);
+
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_LABEL_CSS_SELECTOR)).click();
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_LABEL_SELECTION_CSS_SELECTOR))
+        .click();
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR)).click();
 
     logger.info("added event successfully: " + titleOfEvent);
   }
