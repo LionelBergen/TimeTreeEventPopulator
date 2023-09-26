@@ -6,6 +6,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class Wait {
+  private static final Logger logger = LogManager.getLogger();
+
   public static WebElement WaitForElementVisible(WebDriver driver, String xPath)
       throws InterruptedException {
     return WaitForElementVisible(driver, By.xpath(xPath));
@@ -36,7 +38,7 @@ public class Wait {
     if (elementFound == null) {
       throw new RuntimeException("Cannot find element by: " + by);
     } else {
-      System.out.println("FOUND element by: " + by);
+      logger.info("FOUND element by: " + by);
     }
 
     return elementFound;

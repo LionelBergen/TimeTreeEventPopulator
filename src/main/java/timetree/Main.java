@@ -3,10 +3,14 @@ package timetree;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import java.time.LocalDate;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import timetree.manage.LogManager;
+import timetree.manage.Logger;
 import timetree.manage.SecretValueManager;
 import timetree.webapp.TimeTreeWebAppHandler;
 
 public class Main {
+  private static final Logger logger = LogManager.getLogger();
+
   public static void main(String[] args) throws Exception {
     String username = SecretValueManager.GetUsername();
     String password = SecretValueManager.GetPassword();
@@ -25,11 +29,11 @@ public class Main {
 
     timeTreeWebAppHandler.selectCalendar();
 
-    System.out.println(timeTreeWebAppHandler.getDateDisplayed());
+    logger.info(timeTreeWebAppHandler.getDateDisplayed());
 
     timeTreeWebAppHandler.addNewHoliday(LocalDate.of(2023, 8, 29), "Testing123");
 
-    System.out.println("Ending program.");
+    logger.info("Ending program.");
     // driver.close();
   }
 }
