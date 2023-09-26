@@ -59,37 +59,38 @@ public class TimeTreeWebAppHandler {
     return date;
   }
 
-  public void addNewHoliday(LocalDate holiday, String titleOfHoliday)
+  public void addNewEvent(LocalDate event, String titleOfEvent)
       throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
 
     // Current will always be beginning of the month
-    while (holiday.isBefore(current)) {
+    while (event.isBefore(current)) {
       current = goBackAMonth(current);
     }
 
-    if (calendarContainsHoliday(current, holiday)) {
-      String cssSelector = getElementCssSelectorForDate(holiday);
+    if (currentDisplayedDateContainsEventDate(current, event)) {
+      String cssSelector = getElementCssSelectorForDate(event);
       WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
 
       element.click();
       Wait.WaitFor(50);
       element.click();
       Wait.WaitFor(500);
-      driver.switchTo().activeElement().sendKeys(titleOfHoliday + Keys.RETURN);
+      driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
 
       Wait.WaitForElementVisible(
           driver,
           By.xpath(
               "//div[contains(@class, 'eventRow')]/div/div/div/span[contains(text(), '"
-                  + titleOfHoliday
+                  + titleOfEvent
                   + "')]"));
     }
   }
 
-  private boolean calendarContainsHoliday(LocalDate currentDisplayedDate, LocalDate holiday) {
-    return currentDisplayedDate.getMonthValue() == holiday.getMonthValue()
-        && currentDisplayedDate.getYear() == holiday.getYear();
+  private boolean currentDisplayedDateContainsEventDate(
+      LocalDate currentDisplayedDate, LocalDate eventDate) {
+    return currentDisplayedDate.getMonthValue() == eventDate.getMonthValue()
+        && currentDisplayedDate.getYear() == eventDate.getYear();
   }
 
   private LocalDate goBackAMonth(LocalDate currentDate)

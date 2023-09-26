@@ -31,7 +31,7 @@ public class Main {
 
     logger.info(timeTreeWebAppHandler.getDateDisplayed());
 
-    timeTreeWebAppHandler.addNewHoliday(LocalDate.of(2023, 8, 29), "Testing123");
+    timeTreeWebAppHandler.addNewEvent(LocalDate.of(2023, 8, 29), "Testing123");
 
     logger.info("Ending program.");
     // driver.close();
