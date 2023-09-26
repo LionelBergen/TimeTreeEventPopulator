@@ -66,10 +66,15 @@ public class TimeTreeWebAppHandler {
   public void addNewEvent(LocalDate event, String titleOfEvent)
       throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
+    LocalDate monthAfterCurrent = current.plusMonths(1);
 
     // Current will always be beginning of the month
     while (event.isBefore(current)) {
       current = goBackAMonth(current);
+    }
+
+    while (!currentDisplayedDateContainsEventDate(current, event)) {
+      current = goForwardAMonth(current);
     }
 
     if (currentDisplayedDateContainsEventDate(current, event)) {
@@ -103,14 +108,32 @@ public class TimeTreeWebAppHandler {
 
   private LocalDate goBackAMonth(LocalDate currentDate)
       throws InterruptedException, ParseException {
-    LocalDate newExpectedCurrent = currentDate.minusMonths(1);
+    return changeMonth(currentDate, -1);
+  }
+
+  private LocalDate goForwardAMonth(LocalDate currentDate)
+      throws InterruptedException, ParseException {
+    return changeMonth(currentDate, 1);
+  }
+
+  private LocalDate changeMonth(LocalDate currentDate, int direction)
+      throws InterruptedException, ParseException {
+    if (direction != -1 && direction != 1) {
+      throw new IllegalArgumentException(
+          "Direction should be -1 for previous month or 1 for next month");
+    }
+
+    LocalDate newExpectedCurrent = currentDate.plusMonths(direction);
     // We expect an element with the previous month, 2nd date to be visible (all dates for the month
     // should be visible, plus a few from the previous)
     String expectedCssSelectorToBeVisible =
         getElementCssSelectorForDate(newExpectedCurrent.plusDays(1));
 
     // click previous month button
-    Wait.WaitForElementVisible(driver, By.cssSelector(PREVIOUS_MONTH_CSS_SELECTOR)).click();
+    Wait.WaitForElementVisible(
+            driver,
+            By.cssSelector(direction == 1 ? NEXT_MONTH_CSS_SELECTOR : PREVIOUS_MONTH_CSS_SELECTOR))
+        .click();
 
     // Wait for the month selection to load
     Wait.WaitForElementVisible(driver, By.cssSelector(expectedCssSelectorToBeVisible));
