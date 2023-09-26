@@ -44,7 +44,7 @@ public class Wait {
     return elementFound;
   }
 
-  public static boolean IsElementIfVisible(WebDriver driver, By by) throws InterruptedException {
+  public static boolean IsElementVisible(WebDriver driver, By by) throws InterruptedException {
     int attempts = 0;
     WebElement elementFound = null;
 

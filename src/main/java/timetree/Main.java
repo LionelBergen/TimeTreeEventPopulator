@@ -1,8 +1,9 @@
 package timetree;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import java.time.LocalDate;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import timetree.date.TimeTreeEvent;
+import timetree.date.TimeTreeEventManager;
 import timetree.manage.LogManager;
 import timetree.manage.Logger;
 import timetree.manage.SecretValueManager;
@@ -29,11 +30,11 @@ public class Main {
 
     timeTreeWebAppHandler.selectCalendar();
 
-    logger.info(timeTreeWebAppHandler.getDateDisplayed());
+    logger.info("Current calender month: " + timeTreeWebAppHandler.getDateDisplayed());
 
-    timeTreeWebAppHandler.addNewEvent(LocalDate.of(2023, 8, 29), "Testing123");
-    timeTreeWebAppHandler.addNewEvent(LocalDate.of(2024, 2, 1), "Testing144");
-    timeTreeWebAppHandler.addNewEvent(LocalDate.of(2024, 2, 5), "Testing155");
+    for (TimeTreeEvent event : TimeTreeEventManager.GetAllEvents()) {
+      timeTreeWebAppHandler.addNewEvent(event);
+    }
 
     logger.info("Ending program.");
     // driver.close();

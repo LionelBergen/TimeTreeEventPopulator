@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import timetree.date.TimeTreeEvent;
 import timetree.manage.LogManager;
 import timetree.manage.Logger;
 import timetree.manage.Wait;
@@ -63,46 +64,71 @@ public class TimeTreeWebAppHandler {
     return date;
   }
 
-  public void addNewEvent(LocalDate event, String titleOfEvent)
-      throws ParseException, InterruptedException {
+  public void addNewEvent(TimeTreeEvent event) throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
 
-    // Current will always be beginning of the month
-    while (event.isBefore(current)) {
+    // if we're not already set to the right month in the calendar
+    if (!currentDisplayedDateContainsEventDate(current, event.getStart())) {
+      // Current will always be beginning of the month
+      while (event.getStart().isBefore(current)) {
+        current = goBackAMonth(current);
+      }
+
+      while (!currentDisplayedDateContainsEventDate(current, event.getStart())) {
+        current = goForwardAMonth(current);
+      }
+
+      // TimetreeApp fix/hack... For some reason new events arent showing up without this...
+      current = goForwardAMonth(current);
       current = goBackAMonth(current);
     }
 
-    while (!currentDisplayedDateContainsEventDate(current, event)) {
-      current = goForwardAMonth(current);
+    String cssSelector = getElementCssSelectorForDate(event.getStart());
+    WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
+
+    String xPathForEventDate = getXPathForSetEvent(event);
+    boolean eventInCalendar = Wait.IsElementVisible(driver, By.xpath(xPathForEventDate));
+
+    if (!eventInCalendar) {
+      addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
+    } else {
+      logger.info(
+          "Event already set: "
+              + event.getTitleOfEvent()
+              + " for date: "
+              + event
+              + " element xPath is: "
+              + xPathForEventDate);
     }
+  }
 
-    if (currentDisplayedDateContainsEventDate(current, event)) {
-      String cssSelector = getElementCssSelectorForDate(event);
-      WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
+  private String getXPathForSetEvent(TimeTreeEvent event) {
+    String xPathForEventDate =
+        "//div[contains(@class, 'eventRow')]/div/div/div/span[text() = '"
+            + event.getTitleOfEvent()
+            + "']";
 
-      String xPathForEventDate =
-          "//div[contains(@class, 'eventRow')]/div/div/div/span[contains(text(), '"
-              + titleOfEvent
-              + "')]";
-
-      if (!Wait.IsElementIfVisible(driver, By.xpath(xPathForEventDate))) {
-        element.click();
-        Wait.WaitFor(50);
-        element.click();
-        Wait.WaitFor(500);
-        driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
-
-        Wait.WaitForElementVisible(driver, By.xpath(xPathForEventDate));
-      } else {
-        logger.info("Event already set: " + titleOfEvent + " for date: " + event);
-      }
-    }
+    return xPathForEventDate;
   }
 
   private boolean currentDisplayedDateContainsEventDate(
       LocalDate currentDisplayedDate, LocalDate eventDate) {
     return currentDisplayedDate.getMonthValue() == eventDate.getMonthValue()
         && currentDisplayedDate.getYear() == eventDate.getYear();
+  }
+
+  private void addEventSimple(WebElement element, String titleOfEvent, String xPathForEventDate)
+      throws InterruptedException {
+    logger.info("About to click and add event: " + titleOfEvent);
+    element.click();
+    Wait.WaitFor(50);
+    element.click();
+    Wait.WaitFor(500);
+    driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
+
+    Wait.WaitForElementVisible(driver, By.xpath(xPathForEventDate));
+
+    logger.info("added event successfully: " + titleOfEvent);
   }
 
   private LocalDate goBackAMonth(LocalDate currentDate)
