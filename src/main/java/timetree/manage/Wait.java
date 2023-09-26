@@ -44,6 +44,23 @@ public class Wait {
     return elementFound;
   }
 
+  public static boolean IsElementIfVisible(WebDriver driver, By by) throws InterruptedException {
+    int attempts = 0;
+    WebElement elementFound = null;
+
+    while (attempts < 20 && elementFound == null) {
+      try {
+        elementFound = driver.findElement(by);
+      } catch (NoSuchElementException e) {
+
+      }
+      Thread.sleep(1000);
+      attempts++;
+    }
+
+    return elementFound != null;
+  }
+
   public static void WaitFor(long milliseconds) throws InterruptedException {
     Thread.sleep(milliseconds);
   }

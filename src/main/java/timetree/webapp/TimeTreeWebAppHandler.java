@@ -7,9 +7,13 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import timetree.manage.LogManager;
+import timetree.manage.Logger;
 import timetree.manage.Wait;
 
 public class TimeTreeWebAppHandler {
+  private static final Logger logger = LogManager.getLogger();
+
   private static final String TIMETREE_SIGNIN_URL = "https://timetreeapp.com/signin";
 
   private static final String SIGN_IN_USERNAME_ELEMENT_CSS_SELECTOR =
@@ -72,18 +76,22 @@ public class TimeTreeWebAppHandler {
       String cssSelector = getElementCssSelectorForDate(event);
       WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
 
-      element.click();
-      Wait.WaitFor(50);
-      element.click();
-      Wait.WaitFor(500);
-      driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
+      String xPathForEventDate =
+          "//div[contains(@class, 'eventRow')]/div/div/div/span[contains(text(), '"
+              + titleOfEvent
+              + "')]";
 
-      Wait.WaitForElementVisible(
-          driver,
-          By.xpath(
-              "//div[contains(@class, 'eventRow')]/div/div/div/span[contains(text(), '"
-                  + titleOfEvent
-                  + "')]"));
+      if (!Wait.IsElementIfVisible(driver, By.xpath(xPathForEventDate))) {
+        element.click();
+        Wait.WaitFor(50);
+        element.click();
+        Wait.WaitFor(500);
+        driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
+
+        Wait.WaitForElementVisible(driver, By.xpath(xPathForEventDate));
+      } else {
+        logger.info("Event already set: " + titleOfEvent + " for date: " + event);
+      }
     }
   }
 
