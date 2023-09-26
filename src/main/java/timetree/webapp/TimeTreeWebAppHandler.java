@@ -48,7 +48,7 @@ public class TimeTreeWebAppHandler {
       "div[data-test-id='attendees-select']";
 
   private static final String COMPEX_EVENT_MEMBERS_LIONEL_CSS_SELECTOR =
-      "div[data-test-id='attendees-select']";
+      "li[data-test-id='attendees-select-item-lionel']";
 
   // attendees-select-item-Chava
 
@@ -75,8 +75,8 @@ public class TimeTreeWebAppHandler {
     driver.executeScript("arguments[0].click();", element);
   }
 
-  public LocalDate getDateDisplayed() throws ParseException {
-    String result = driver.findElement(By.xpath("//time")).getAttribute("datetime");
+  public LocalDate getDateDisplayed() throws ParseException, InterruptedException {
+    String result = Wait.WaitForElementVisible(driver, By.xpath("//time")).getAttribute("datetime");
 
     LocalDate date = TimeTreeDateFormat.ParseDateElementValue(result);
 
@@ -184,6 +184,10 @@ public class TimeTreeWebAppHandler {
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_LABEL_SELECTION_CSS_SELECTOR))
         .click();
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR)).click();
+
+    // TOOD: find the element then find inner element to check if selected or not.
+    // Wait.WaitForElementVisible(driver,
+    // By.cssSelector(COMPEX_EVENT_MEMBERS_LIONEL_CSS_SELECTOR)).click();
 
     logger.info("added event successfully: " + titleOfEvent);
   }
