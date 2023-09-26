@@ -66,7 +66,6 @@ public class TimeTreeWebAppHandler {
   public void addNewEvent(LocalDate event, String titleOfEvent)
       throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
-    LocalDate monthAfterCurrent = current.plusMonths(1);
 
     // Current will always be beginning of the month
     while (event.isBefore(current)) {
