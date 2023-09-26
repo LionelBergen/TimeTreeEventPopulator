@@ -41,4 +41,8 @@ public class Wait {
 
     return elementFound;
   }
+
+  public static void WaitFor(long milliseconds) throws InterruptedException {
+    Thread.sleep(milliseconds);
+  }
 }

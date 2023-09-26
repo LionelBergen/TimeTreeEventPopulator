@@ -3,6 +3,7 @@ package timetree.webapp;
 import java.text.ParseException;
 import java.time.LocalDate;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -58,13 +59,37 @@ public class TimeTreeWebAppHandler {
     return date;
   }
 
-  public void addNewHoliday(LocalDate holiday) throws ParseException, InterruptedException {
+  public void addNewHoliday(LocalDate holiday, String titleOfHoliday)
+      throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
 
     // Current will always be beginning of the month
-    if (holiday.isBefore(current)) {
-      goBackAMonth(current);
+    while (holiday.isBefore(current)) {
+      current = goBackAMonth(current);
     }
+
+    if (calendarContainsHoliday(current, holiday)) {
+      String cssSelector = getElementCssSelectorForDate(holiday);
+      WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
+
+      element.click();
+      Wait.WaitFor(50);
+      element.click();
+      Wait.WaitFor(500);
+      driver.switchTo().activeElement().sendKeys(titleOfHoliday + Keys.RETURN);
+
+      Wait.WaitForElementVisible(
+          driver,
+          By.xpath(
+              "//div[contains(@class, 'eventRow')]/div/div/div/span[contains(text(), '"
+                  + titleOfHoliday
+                  + "')]"));
+    }
+  }
+
+  private boolean calendarContainsHoliday(LocalDate currentDisplayedDate, LocalDate holiday) {
+    return currentDisplayedDate.getMonthValue() == holiday.getMonthValue()
+        && currentDisplayedDate.getYear() == holiday.getYear();
   }
 
   private LocalDate goBackAMonth(LocalDate currentDate)

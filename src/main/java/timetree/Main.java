@@ -27,7 +27,7 @@ public class Main {
 
     System.out.println(timeTreeWebAppHandler.getDateDisplayed());
 
-    timeTreeWebAppHandler.addNewHoliday(LocalDate.ofYearDay(2020, 1));
+    timeTreeWebAppHandler.addNewHoliday(LocalDate.of(2023, 8, 29), "Testing123");
 
     System.out.println("Ending program.");
     // driver.close();

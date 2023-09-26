@@ -19,7 +19,7 @@ public class TimeTreeDateFormat {
   public static String GetFormatForDateCell(LocalDate date) {
     return date.getYear()
         + "-"
-        + GetValueWithZero(date.getMonth().getValue())
+        + GetValueWithZero(date.getMonthValue())
         + "-"
         + GetValueWithZero(date.getDayOfMonth())
         + "']";
