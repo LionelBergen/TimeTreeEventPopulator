@@ -1,7 +1,7 @@
 Rosh Hashana,2024-10-2,2024-10-04
-Rosh Hashana 2025-09-22,2025-09-24
-Rosh Hashana 2026-09-11,2026-09-13
-Rosh Hashana 2027-10-01,2027-10-03
+Rosh Hashana,2025-09-22,2025-09-24
+Rosh Hashana,2026-09-11,2026-09-13
+Rosh Hashana,2027-10-01,2027-10-03
 Yom Kippur,2024-10-11,2024-10-12
 Yom Kippur,2025-10-01,2025-10-02
 Yom Kippur,2026-09-20,2026-09-21
