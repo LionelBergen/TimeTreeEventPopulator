@@ -1,9 +1,33 @@
-Rosh Hashana,
-Yom Kippur,
-Sukkot ( not celerbrated),
-Simchat Torah,
-Hanukkah,
-Tu B'shevat / Tu Bishvat,
-Purim,
-Passover,
-Yom HaShoah (Holocaust rememberence day, not a 'holiday'.)
+Rosh Hashana,2024-10-2,2024-10-04
+Rosh Hashana 2025-09-22,2025-09-24
+Rosh Hashana 2026-09-11,2026-09-13
+Rosh Hashana 2027-10-01,2027-10-03
+Yom Kippur,2024-10-11,2024-10-12
+Yom Kippur,2025-10-01,2025-10-02
+Yom Kippur,2026-09-20,2026-09-21
+Yom Kippur,2027-10-10,2027-10-11
+Simchat Torah,2024-10-23,2024-10-25
+Simchat Torah,2025-10-13,2025-10-15
+Simchat Torah,2026-10-02,2026-10-04
+Simchat Torah,2027-10-22,2027-10-24
+Hanukkah,2023-12-07,2023-12-15
+Hanukkah,2024-12-25,2025-01-02
+Hanukkah,2025-12-14,2025-12-22
+Hanukkah,2026-12-04,2026-12-12
+Hanukkah,2027-12-24,2028-01-01
+Tu B'shevat,2024-01-24,2024-01-25
+Tu B'shevat,2025-02-12,2025-02-13
+Tu B'shevat,2026-02-01,2026-02-02
+Tu B'shevat,2027-01-22,2027-01-23
+Purim,2024-03-21,2024-03-25
+Purim,2025-03-13,2025-03-15
+Purim,2026-03-02,2026-03-04
+Purim,2027-03-22,2027-03-24
+Passover,2024-04-22,2024-04-30
+Passover,2025-04-12,2025-04-20
+Passover,2026-04-01,2026-04-09
+Passover,2027-04-21,2027-04-29
+Yom HaShoah,2024-05-06,2024-05-06
+Yom HaShoah,2025-04-24,2025-04-24
+Yom HaShoah,2026-04-14,2026-04-14
+Yom HaShoah,2027-05-04,2027-05-04
