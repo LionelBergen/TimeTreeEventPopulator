@@ -19,16 +19,10 @@ public class Main {
     String password = SecretValueManager.GetPassword();
     String users = SecretValueManager.GetUsers();
 
-    if (username == null
-        || password == null
-        || users == null
-        || users.isBlank()
-        || username.isBlank()
-        || password.isBlank()) {
+    if (isAnyEmptyOrNull(username, password, users)) {
       throw new RuntimeException(
           "Timtree username, password, userlist must be set as environment variables! See readme.md");
     }
-
     List<String> userList = Arrays.asList(users.split(","));
 
     WebDriverManager.firefoxdriver().setup();
@@ -46,5 +40,15 @@ public class Main {
 
     logger.info("Ending program.");
     // driver.close();
+  }
+
+  private static boolean isAnyEmptyOrNull(String... strings) {
+    for (String string : strings) {
+      if (string == null || string.isBlank()) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
