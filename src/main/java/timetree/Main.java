@@ -1,6 +1,8 @@
 package timetree;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import java.util.Arrays;
+import java.util.List;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import timetree.date.TimeTreeEvent;
 import timetree.date.TimeTreeEventManager;
@@ -15,11 +17,19 @@ public class Main {
   public static void main(String[] args) throws Exception {
     String username = SecretValueManager.GetUsername();
     String password = SecretValueManager.GetPassword();
+    String users = SecretValueManager.GetUsers();
 
-    if (username == null || password == null || username.isBlank() || password.isBlank()) {
+    if (username == null
+        || password == null
+        || users == null
+        || users.isBlank()
+        || username.isBlank()
+        || password.isBlank()) {
       throw new RuntimeException(
-          "Timtree username and password must be set as environment variables! See readme.md");
+          "Timtree username, password, userlist must be set as environment variables! See readme.md");
     }
+
+    List<String> userList = Arrays.asList(users.split(","));
 
     WebDriverManager.firefoxdriver().setup();
     FirefoxDriver driver = new FirefoxDriver();
@@ -31,7 +41,7 @@ public class Main {
     logger.info("Current calender month: " + timeTreeWebAppHandler.getDateDisplayed());
 
     for (TimeTreeEvent event : TimeTreeEventManager.GetAllEvents()) {
-      timeTreeWebAppHandler.addNewEvent(event);
+      timeTreeWebAppHandler.addNewEvent(event, userList);
     }
 
     logger.info("Ending program.");

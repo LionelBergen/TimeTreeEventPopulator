@@ -6,5 +6,6 @@ Requirements
 ------------  
 Set environment variables:  
 **TIMETREE_EMAIL_ID**  
-**TIMETREE_PASSWORD**  
+**TIMETREE_PASSWORD**    
+**TIMETREE_USERS**   - Case sensetive List of users, delimited by comma who should be added for each event. Must exist in the Calendar E.G Lionel,fred 
 

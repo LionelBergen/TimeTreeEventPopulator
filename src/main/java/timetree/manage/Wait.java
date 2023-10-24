@@ -61,6 +61,30 @@ public class Wait {
     return elementFound != null;
   }
 
+  public static void WaitForElementPropertyValue(
+      WebElement element, String propertyName, String propertyExpectedValue)
+      throws InterruptedException {
+    int attempts = 0;
+    String actualValue = null;
+
+    while (attempts < 20 && !propertyExpectedValue.equals(actualValue)) {
+      actualValue = element.getAttribute(propertyName);
+
+      Thread.sleep(1000);
+      attempts++;
+    }
+
+    if (!propertyExpectedValue.equals(actualValue)) {
+      throw new RuntimeException(
+          "element attribute: "
+              + propertyName
+              + " is: "
+              + actualValue
+              + " expected: "
+              + propertyExpectedValue);
+    }
+  }
+
   public static void WaitFor(long milliseconds) throws InterruptedException {
     Thread.sleep(milliseconds);
   }

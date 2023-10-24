@@ -2,6 +2,7 @@ package timetree.webapp;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -37,6 +38,8 @@ public class TimeTreeWebAppHandler {
       "div[data-test-id='quick-create-more'";
   private static final String COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR =
       "button[data-test-id='event-form-submit-button']";
+  private static final String COMPLEX_EVENT_CANCEL_BUTTON_CSS_SELECTOR =
+      "button[data-test-id='event-form-cancel-button']";
   private static final String COMPEX_EVENT_END_DATE_CSS_SELECTOR =
       "input[data-test-id='end-date-picker']";
   private static final String COMPEX_EVENT_TITLE_CSS_SELECTOR = "form[data-test-id='event-form']";
@@ -47,10 +50,11 @@ public class TimeTreeWebAppHandler {
   private static final String COMPEX_EVENT_MEMBERS_CSS_SELECTOR =
       "div[data-test-id='attendees-select']";
 
-  private static final String COMPEX_EVENT_MEMBERS_LIONEL_CSS_SELECTOR =
-      "li[data-test-id='attendees-select-item-lionel']";
+  private static final String COMPEX_EVENT_MEMBERS_CSS_SELECTOR_PREFIX =
+      "li[data-test-id='attendees-select-item-";
 
-  // attendees-select-item-Chava
+  private static final String COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR =
+      "button[data-test-id='confirm-dialog-ok-button']";
 
   private RemoteWebDriver driver;
 
@@ -83,7 +87,8 @@ public class TimeTreeWebAppHandler {
     return date;
   }
 
-  public void addNewEvent(TimeTreeEvent event) throws ParseException, InterruptedException {
+  public void addNewEvent(TimeTreeEvent event, List<String> users)
+      throws ParseException, InterruptedException {
     LocalDate current = getDateDisplayed();
 
     // if we're not already set to the right month in the calendar
@@ -112,7 +117,7 @@ public class TimeTreeWebAppHandler {
       if (event.getEnd() == null) {
         addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
       } else {
-        addEventComplex(element, event.getTitleOfEvent(), xPathForEventDate);
+        addEventComplex(element, event.getTitleOfEvent(), xPathForEventDate, users);
       }
     } else {
       logger.info(
@@ -154,7 +159,8 @@ public class TimeTreeWebAppHandler {
     logger.info("added event successfully: " + titleOfEvent);
   }
 
-  private void addEventComplex(WebElement element, String titleOfEvent, String xPathForEventDate)
+  private void addEventComplex(
+      WebElement element, String titleOfEvent, String xPathForEventDate, List<String> users)
       throws InterruptedException {
     logger.info("About to click and add complex event: " + titleOfEvent);
     element.click();
@@ -185,9 +191,24 @@ public class TimeTreeWebAppHandler {
         .click();
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR)).click();
 
-    // TOOD: find the element then find inner element to check if selected or not.
-    // Wait.WaitForElementVisible(driver,
-    // By.cssSelector(COMPEX_EVENT_MEMBERS_LIONEL_CSS_SELECTOR)).click();
+    for (String user : users) {
+      WebElement userElement =
+          Wait.WaitForElementVisible(
+              driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR_PREFIX + user + "']"));
+      WebElement nameElement = userElement.findElement(By.id("name"));
+
+      boolean isChecked = "true".equals(nameElement.getAttribute("aria-checked"));
+
+      if (!isChecked) {
+        userElement.click();
+        Wait.WaitForElementPropertyValue(nameElement, "aria-checked", "true");
+      }
+    }
+
+    driver.findElement(By.cssSelector(COMPLEX_EVENT_CANCEL_BUTTON_CSS_SELECTOR)).click();
+    Wait.WaitForElementVisible(driver, By.className("erwgtag4")).click();
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR))
+        .click();
 
     logger.info("added event successfully: " + titleOfEvent);
   }

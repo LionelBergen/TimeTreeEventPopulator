@@ -8,4 +8,8 @@ public class SecretValueManager {
   public static String GetPassword() {
     return System.getenv("TIMETREE_PASSWORD");
   }
+
+  public static String GetUsers() {
+    return System.getenv("TIMETREE_USERS");
+  }
 }
