@@ -25,6 +25,11 @@ public class TimeTreeDateFormat {
         + "']";
   }
 
+  public static String GetFormatForInput(LocalDate date) {
+    // Oct 25, 2023
+    return DateTimeFormatter.ofPattern("MMM dd, yyyy").format(date);
+  }
+
   private static String GetValueWithZero(int value) {
     String result = "";
 

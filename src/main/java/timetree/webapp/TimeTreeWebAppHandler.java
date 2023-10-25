@@ -2,10 +2,8 @@ package timetree.webapp;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -57,6 +55,15 @@ public class TimeTreeWebAppHandler {
   private static final String COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR =
       "button[data-test-id='confirm-dialog-ok-button']";
 
+  private static final String EVENT_ADD_NEW_BUTTON_CSS_SELECTOR =
+      "button[data-test-id='calendar-bar-event-add-button']";
+  private static final String NEW_EVENT_START_DATE_INPUT_CSS_SELECTOR =
+      "input[data-test-id='start-date-picker']";
+  private static final String NEW_EVENT_END_DATE_INPUT_CSS_SELECTOR =
+      "input[data-test-id='end-date-picker']";
+  private static final String NEW_EVENT_NOTIFICATION_CSS_SELECTOR =
+      "input[data-test-id='reminders-select']";
+
   private RemoteWebDriver driver;
 
   public TimeTreeWebAppHandler(RemoteWebDriver webDriver) {
@@ -90,107 +97,49 @@ public class TimeTreeWebAppHandler {
 
   public void addNewEvent(TimeTreeEvent event, List<String> users)
       throws ParseException, InterruptedException {
-    LocalDate current = getDateDisplayed();
+    logger.info("About to click and add complex event: " + event.getTitleOfEvent());
 
-    // if we're not already set to the right month in the calendar
-    if (!currentDisplayedDateContainsEventDate(current, event.getStart())) {
-      // Current will always be beginning of the month
-      while (event.getStart().isBefore(current)) {
-        current = goBackAMonth(current);
-      }
+    clickNewEventButton(driver);
+    enterTitleForEvent(driver, event.getTitleOfEvent());
+    enterStartAndEndDate(driver, event.getStart(), event.getEnd());
+    selectUsersForEvent(driver, users);
+    selectHolidayTypeForEvent(driver);
 
-      while (!currentDisplayedDateContainsEventDate(current, event.getStart())) {
-        current = goForwardAMonth(current);
-      }
+    String notificationValue = getNotificationValueForEvent(driver);
 
-      // TimetreeApp fix/hack... For some reason new events arent showing up without this...
-      current = goForwardAMonth(current);
-      current = goBackAMonth(current);
+    if (notificationValue == null || notificationValue.isBlank()) {
+      setNotificationValueForEvent(driver);
     }
 
-    String cssSelector = getElementCssSelectorForDate(event.getStart());
-    WebElement element = Wait.WaitForElementVisible(driver, By.cssSelector(cssSelector));
-
-    String xPathForEventDate = getXPathForSetEvent(event);
-    boolean eventInCalendar = Wait.IsElementVisible(driver, By.xpath(xPathForEventDate));
-
-    if (!eventInCalendar) {
-      if (event.getEnd() == null) {
-        addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
-      } else {
-        addEventComplex(element, event.getTitleOfEvent(), event.getEnd(), users);
-      }
-    } else {
-      logger.info(
-          "Event already set: "
-              + event.getTitleOfEvent()
-              + " for date: "
-              + event
-              + " element xPath is: "
-              + xPathForEventDate);
-    }
+    submitNewEvent();
   }
 
-  private String getXPathForSetEvent(TimeTreeEvent event) {
-    String xPathForEventDate =
-        "//div[contains(@class, 'eventRow')]/div/div/div/span[text() = \""
-            + event.getTitleOfEvent()
-            + "\"]";
-
-    return xPathForEventDate;
-  }
-
-  private boolean currentDisplayedDateContainsEventDate(
-      LocalDate currentDisplayedDate, LocalDate eventDate) {
-    return currentDisplayedDate.getMonthValue() == eventDate.getMonthValue()
-        && currentDisplayedDate.getYear() == eventDate.getYear();
-  }
-
-  private void addEventSimple(WebElement element, String titleOfEvent, String xPathForEventDate)
-      throws InterruptedException {
-    logger.info("About to click and add event: " + titleOfEvent);
-    element.click();
-    Wait.WaitFor(50);
-    element.click();
-    Wait.WaitFor(500);
-    driver.switchTo().activeElement().sendKeys(titleOfEvent + Keys.RETURN);
-
-    Wait.WaitForElementVisible(driver, By.xpath(xPathForEventDate));
-
-    logger.info("added event successfully: " + titleOfEvent);
-  }
-
-  private void addEventComplex(
-      WebElement element, String titleOfEvent, LocalDate endDate, List<String> users)
-      throws InterruptedException {
-    logger.info("About to click and add complex event: " + titleOfEvent);
-    Wait.WaitFor(150);
-    element.click();
-    Wait.WaitFor(150);
-    element.click();
-    Wait.WaitFor(500);
-
-    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_OPEN_CSS_SELECTOR)).click();
-
-    Wait.WaitForElementVisible(driver, By.cssSelector(COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR));
-
-    WebElement endDateElement =
-        driver.findElement(By.cssSelector(COMPEX_EVENT_END_DATE_CSS_SELECTOR));
-
-    endDateElement.clear();
-
-    endDateElement.sendKeys(DateTimeFormatter.ofPattern("MMM dd, yyyy").format(endDate));
-
+  private void enterTitleForEvent(RemoteWebDriver driver, String titleOfEvent) {
     WebElement titleElement =
         driver
             .findElement(By.cssSelector(COMPEX_EVENT_TITLE_CSS_SELECTOR))
             .findElement(By.tagName("textarea"));
 
     titleElement.sendKeys(titleOfEvent);
+  }
 
+  private void selectHolidayTypeForEvent(RemoteWebDriver driver) throws InterruptedException {
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_LABEL_CSS_SELECTOR)).click();
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_LABEL_SELECTION_CSS_SELECTOR))
         .click();
+  }
+
+  private void submitNewEvent() throws InterruptedException {
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR))
+        .click();
+
+    /*Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR))
+    .click();*/
+  }
+
+  private void selectUsersForEvent(RemoteWebDriver driver, List<String> users)
+      throws InterruptedException {
+    // click users label
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR)).click();
 
     for (String user : users) {
@@ -206,13 +155,37 @@ public class TimeTreeWebAppHandler {
         Wait.WaitForElementPropertyValue(nameElement, "aria-checked", "true");
       }
     }
+    // click users label again to close the window
+    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_MEMBERS_CSS_SELECTOR)).click();
+  }
 
-    driver.findElement(By.cssSelector(COMPLEX_EVENT_CANCEL_BUTTON_CSS_SELECTOR)).click();
-    Wait.WaitForElementVisible(driver, By.className("erwgtag4")).click();
-    Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR))
-        .click();
+  private void enterStartAndEndDate(RemoteWebDriver driver, LocalDate start, LocalDate end)
+      throws InterruptedException {
+    WebElement startDateElement =
+        Wait.WaitForElementVisible(driver, By.cssSelector(NEW_EVENT_START_DATE_INPUT_CSS_SELECTOR));
+    WebElement endDateElement =
+        Wait.WaitForElementVisible(driver, By.cssSelector(NEW_EVENT_END_DATE_INPUT_CSS_SELECTOR));
 
-    logger.info("added event successfully: " + titleOfEvent);
+    startDateElement.clear();
+    startDateElement.sendKeys(TimeTreeDateFormat.GetFormatForInput(start));
+
+    endDateElement.clear();
+    endDateElement.sendKeys(TimeTreeDateFormat.GetFormatForInput(end));
+  }
+
+  private void clickNewEventButton(WebDriver driver) throws InterruptedException {
+    Wait.WaitForElementVisible(driver, By.cssSelector(EVENT_ADD_NEW_BUTTON_CSS_SELECTOR)).click();
+  }
+
+  private String getNotificationValueForEvent(WebDriver driver) throws InterruptedException {
+    return Wait.WaitForElementVisible(driver, By.cssSelector(NEW_EVENT_NOTIFICATION_CSS_SELECTOR))
+        .getAttribute("value");
+  }
+
+  private void setNotificationValueForEvent(WebDriver driver) throws InterruptedException {
+    Wait.WaitForElementVisible(driver, By.cssSelector(NEW_EVENT_NOTIFICATION_CSS_SELECTOR)).click();
+
+    Wait.WaitForElementVisible(driver, By.xpath("//button[text() = 'Add notification']")).click();
   }
 
   private LocalDate goBackAMonth(LocalDate currentDate)
