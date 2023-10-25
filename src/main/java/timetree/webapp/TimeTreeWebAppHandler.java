@@ -112,6 +112,8 @@ public class TimeTreeWebAppHandler {
     }
 
     submitNewEvent();
+
+    Wait.WaitFor(2000);
   }
 
   private void enterTitleForEvent(RemoteWebDriver driver, String titleOfEvent)
