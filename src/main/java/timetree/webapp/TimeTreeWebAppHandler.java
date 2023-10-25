@@ -132,9 +132,6 @@ public class TimeTreeWebAppHandler {
   private void submitNewEvent() throws InterruptedException {
     Wait.WaitForElementVisible(driver, By.cssSelector(COMPLEX_EVENT_SUBMIT_BUTTON_CSS_SELECTOR))
         .click();
-
-    /*Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_CANCEL_DAILOG_OKAY_CSS_SELECTOR))
-    .click();*/
   }
 
   private void selectUsersForEvent(RemoteWebDriver driver, List<String> users)
