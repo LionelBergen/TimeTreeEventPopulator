@@ -2,6 +2,7 @@ package timetree.webapp;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -117,7 +118,7 @@ public class TimeTreeWebAppHandler {
       if (event.getEnd() == null) {
         addEventSimple(element, event.getTitleOfEvent(), xPathForEventDate);
       } else {
-        addEventComplex(element, event.getTitleOfEvent(), xPathForEventDate, users);
+        addEventComplex(element, event.getTitleOfEvent(), event.getEnd(), users);
       }
     } else {
       logger.info(
@@ -132,9 +133,9 @@ public class TimeTreeWebAppHandler {
 
   private String getXPathForSetEvent(TimeTreeEvent event) {
     String xPathForEventDate =
-        "//div[contains(@class, 'eventRow')]/div/div/div/span[text() = '"
+        "//div[contains(@class, 'eventRow')]/div/div/div/span[text() = \""
             + event.getTitleOfEvent()
-            + "']";
+            + "\"]";
 
     return xPathForEventDate;
   }
@@ -160,11 +161,12 @@ public class TimeTreeWebAppHandler {
   }
 
   private void addEventComplex(
-      WebElement element, String titleOfEvent, String xPathForEventDate, List<String> users)
+      WebElement element, String titleOfEvent, LocalDate endDate, List<String> users)
       throws InterruptedException {
     logger.info("About to click and add complex event: " + titleOfEvent);
+    Wait.WaitFor(150);
     element.click();
-    Wait.WaitFor(50);
+    Wait.WaitFor(150);
     element.click();
     Wait.WaitFor(500);
 
@@ -177,7 +179,7 @@ public class TimeTreeWebAppHandler {
 
     endDateElement.clear();
 
-    endDateElement.sendKeys("Sep 29, 2023");
+    endDateElement.sendKeys(DateTimeFormatter.ofPattern("MMM dd, yyyy").format(endDate));
 
     WebElement titleElement =
         driver
