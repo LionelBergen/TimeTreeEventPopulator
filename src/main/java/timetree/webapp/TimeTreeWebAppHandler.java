@@ -114,10 +114,10 @@ public class TimeTreeWebAppHandler {
     submitNewEvent();
   }
 
-  private void enterTitleForEvent(RemoteWebDriver driver, String titleOfEvent) {
+  private void enterTitleForEvent(RemoteWebDriver driver, String titleOfEvent)
+      throws InterruptedException {
     WebElement titleElement =
-        driver
-            .findElement(By.cssSelector(COMPEX_EVENT_TITLE_CSS_SELECTOR))
+        Wait.WaitForElementVisible(driver, By.cssSelector(COMPEX_EVENT_TITLE_CSS_SELECTOR))
             .findElement(By.tagName("textarea"));
 
     titleElement.sendKeys(titleOfEvent);
